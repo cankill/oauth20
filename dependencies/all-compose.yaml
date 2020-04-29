@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: postgres_container
+    build:
+      context: ./Docker
+      dockerfile: db.Dockerfile
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      PGDATA: /opt/postgres
+    volumes:
+       - ${POSTGRES_PATH:-./db/postgres}:/opt/postgres
+    ports:
+      - 5432:5432
+    networks:
+      - postgres
+#    restart: unless-stopped
+  
+  oauth20:
+     container_name: oauth20
+#     image: oauth20-provider:1.0
+     build:
+        context: ../
+        dockerfile: app.Dockerfile
+     depends_on:
+        - postgres
+     environment:
+       KEYSTORE_PATH: ${KEYSTORE_PATH:-/server.jks}
+       API_HOST: ${API_HOST:-0.0.0.0}
+       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+     ports:
+       - ${API_PORT:-8080}:8080
+       - 5005:5005
+     networks:
+       - postgres
+#     restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+    postgres:
+    # pgadmin:

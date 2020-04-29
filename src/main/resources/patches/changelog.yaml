@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - preConditions:
+      - runningAs:
+          username: oauth20
+
+  - changeSet:
+      id: Create Client table
+      author: fan
+      changes:
+        - createTable:
+            tableName: client
+            columns:
+              - column:
+                  name: client_id
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: application_id
+                  type: varchar(50)
+              - column:
+                  name: secret_id
+                  type: varchar(50)
+              - column:
+                  name: state
+                  type: varchar(50)
+              - column:
+                  name: created
+                  type: datetime
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modified
+                  type: datetime
+
+  - changeSet:
+      id: Modify Client table
+      author: fan
+      changes:
+        - addColumn:
+            tableName: client
+            columns:
+              - column:
+                  name: callback_url
+                  type: varchar(255)
+
+  - changeSet:
+      id: Create User table
+      author: fan
+      changes:
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: login
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(255)
+              - column:
+                  name: user_name
+                  type: varchar(255)
+              - column:
+                  name: created
+                  type: datetime
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modified
+                  type: datetime
+#
+#  - changeSet:
+#      id: 3
+#      author: nvoxland
+#      changes:
+#        - addLookupTable:
+#            existingTableName: person
+#            existingColumnName: state
+#            newTableName: state
+#            newColumnName: id
+#            newColumnDataType: char(2)

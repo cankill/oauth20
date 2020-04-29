@@ -1,0 +1,31 @@
+<configuration>
+    <timestamp key="_dailyLog" datePattern="yyyyMMdd" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%.-1level][%12.12thread{12}] %30.30logger{30} %X{akkaSource}: %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="STDOUT" />
+    </appender>
+
+<!--    <logger name="akka" level="DEBUG" />-->
+<!--    <logger name="akka.http.impl.engine.client" level="INFO" />-->
+<!--    <logger name="akka.stream.impl.io.TLSActor" level="INFO" />-->
+<!--    <logger name="akka.io.TcpOutgoingConnection" level="INFO" />-->
+<!--    <logger name="application" level="INFO" />-->
+    <logger name="com.fan.impactech" level="DEBUG" />
+    <logger name="slick" level="INFO" />
+    <logger name="slick.jdbc" level="INFO" />
+    <!--<logger name="slick.jdbc.JdbcBackend.statement" level="DEBUG" />-->
+    <!--<logger name="slick.jdbc.JdbcBackend.parameter" level="DEBUG" />-->
+    <logger name="com.zaxxer.hikari" level="INFO" />
+<!--    <logger name="org.apache" level="ERROR" />-->
+
+    <root level="INFOF">
+        <appender-ref ref="ASYNCSTDOUT" />
+    </root>
+
+</configuration>
