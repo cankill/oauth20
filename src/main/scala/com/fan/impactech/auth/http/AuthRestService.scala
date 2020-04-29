@@ -42,8 +42,8 @@ class AuthRestService (implicit inject: Injector) extends Injectable with LazyLo
     get {
       path("auth") {
         authenticateBasic(realm = "secure site", myUserPassAuthenticator) { userName =>
-          logger.debug(s"Got request to get exist Client: $clientId")
-          onComplete(clientRepo.ask[ClientResponseMessage](ref => GetClient(clientId, ref))) {
+          logger.debug(s"Got request to authenticate: $userName")
+          onComplete(clientRepo.ask[ClientResponseMessage](ref => GetClient(userName, ref))) {
             case Success(ClientDeleted) =>
               complete(StatusCodes.NoContent)
 
