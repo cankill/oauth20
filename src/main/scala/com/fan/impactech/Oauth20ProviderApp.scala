@@ -9,8 +9,12 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorSystem, ActorRef => TypedActorRef}
 import akka.event.Logging
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.DebuggingDirectives
 import akka.http.scaladsl.{ConnectionContext, Http}
+import com.fan.impactech.auth.dao.{AuthDao, AuthDaoImpl}
+import com.fan.impactech.auth.http.AuthRestService
+import com.fan.impactech.auth.service.AuthService
 import com.fan.impactech.client.dao.ClientDao
 import com.fan.impactech.client.dao.domain.ClientDTO
 import com.fan.impactech.client.http.ClientRestService
@@ -54,6 +58,7 @@ object Oauth20ProviderApp extends App with AkkaInjectable with LazyLogging {
 
     bind[GenericDao[ClientDTO, Done]] to new ClientDao()
     bind[GenericDao[UserDTO, Done]] to new UserDao()
+    bind[AuthDao] to new AuthDaoImpl()
 
     bind[TypedActorRef[ClientRepository.Protocol]] to
       typedSystem.systemActorOf(ClientRepository.behaviour(config, inject[GenericDao[ClientDTO, Done]]), ClientRepository.name)
@@ -67,21 +72,26 @@ object Oauth20ProviderApp extends App with AkkaInjectable with LazyLogging {
     bind[TypedActorRef[UserValidator.Protocol]] to
       typedSystem.systemActorOf(UserValidator.behaviour(config), UserValidator.name)
 
+    bind[TypedActorRef[AuthService.Protocol]] to
+      typedSystem.systemActorOf(AuthService.behaviour(config, inject[AuthDao]), AuthService.name)
+
     bind[ClientRestService] to new ClientRestService()
     bind[UserRestService] to new UserRestService()
+    bind[AuthRestService] to new AuthRestService()
   }
 
   patchDataBase {
     val route = {
       val httpUserService: UserRestService = inject[UserRestService]
-      val userServiceLogRequest = DebuggingDirectives.logRequest("UserManagement", Logging.DebugLevel)(httpUserService.userManagementRoute)
-      val userServiceRoute = DebuggingDirectives.logResult("UserManagement", Logging.DebugLevel)(userServiceLogRequest)
+      val userServiceRoute = addDebugSupportToRoute(httpUserService.userManagementRoute, "UserManagement")
 
       val httpClientService: ClientRestService = inject[ClientRestService]
-      val clientServiceLogRequest = DebuggingDirectives.logRequest("ClientManagement", Logging.DebugLevel)(httpClientService.clientsManagementRoute)
-      val clientServiceRoute = DebuggingDirectives.logResult("ClientManagement", Logging.DebugLevel)(clientServiceLogRequest)
+      val clientServiceRoute = addDebugSupportToRoute(httpClientService.clientsManagementRoute, "ClientManagement")
 
-      userServiceRoute ~ clientServiceRoute
+      val httpAuthService: AuthRestService = inject[AuthRestService]
+      val authServiceRoute = addDebugSupportToRoute(httpAuthService.authRoute, "AuthManagement")
+
+      userServiceRoute ~ clientServiceRoute ~ authServiceRoute
     }
 
     val httpsContext = makeHttpsContext()
@@ -95,6 +105,11 @@ object Oauth20ProviderApp extends App with AkkaInjectable with LazyLogging {
           appModule.destroy()
         case Success(_) => ()
       }
+  }
+
+  private[this] def addDebugSupportToRoute(route: Route, name: String) = {
+    DebuggingDirectives.logResult(name, Logging.DebugLevel)
+                                 (DebuggingDirectives.logRequest(name, Logging.DebugLevel)(route))
   }
 
   @tailrec

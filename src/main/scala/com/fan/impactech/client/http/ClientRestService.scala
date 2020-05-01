@@ -65,6 +65,27 @@ class ClientRestService (implicit inject: Injector) extends Injectable with Lazy
       path("client" / Segment ) { clientId =>
         logger.debug(s"Got request to get exist Client: $clientId")
         onComplete(clientRepo.ask[ClientResponseMessage](ref => GetClient(clientId, ref))) {
+          case Success(ClientFound(clients)) =>
+            import com.fan.impactech.client.dao.domain.ClientState._
+            complete(StatusCodes.OK -> clients.asJson)
+
+          case Success(ClientNotFound) =>
+            complete(StatusCodes.NotFound)
+
+          case Success(DbFailure(ex)) =>
+            logger.error("Exception: ", ex)
+            complete(StatusCodes.InternalServerError)
+
+          case Failure(e) =>
+            logger.error("Exception: ", e)
+            complete(StatusCodes.InternalServerError -> e.getMessage)
+        }
+      }
+    } ~
+    delete {
+      path("client" / Segment ) { clientId =>
+        logger.debug(s"Got request to delete exist Client: $clientId")
+        onComplete(clientRepo.ask[ClientResponseMessage](ref => GetClient(clientId, ref))) {
           case Success(ClientDeleted) =>
             complete(StatusCodes.NoContent)
 

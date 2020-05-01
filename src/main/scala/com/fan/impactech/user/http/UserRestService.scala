@@ -65,8 +65,8 @@ class UserRestService (implicit inject: Injector) extends Injectable with LazyLo
       path("user" / Segment ) { userId =>
         logger.debug(s"Got request to get exist User: $userId")
         onComplete(userRepo.ask[UserResponseMessage](ref => GetUser(userId, ref))) {
-          case Success(UserFound(user)) =>
-            complete(StatusCodes.OK -> user.asJson)
+          case Success(UserFound(users)) =>
+            complete(StatusCodes.OK -> users.asJson)
 
           case Success(UserNotFound) =>
             complete(StatusCodes.NotFound)

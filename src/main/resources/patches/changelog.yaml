@@ -74,14 +74,3 @@ databaseChangeLog:
               - column:
                   name: modified
                   type: datetime
-#
-#  - changeSet:
-#      id: 3
-#      author: nvoxland
-#      changes:
-#        - addLookupTable:
-#            existingTableName: person
-#            existingColumnName: state
-#            newTableName: state
-#            newColumnName: id
-#            newColumnDataType: char(2)
