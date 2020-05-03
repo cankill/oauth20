@@ -1,5 +1,5 @@
 package com.fan.impactech.user.http.domain
 
-case class UserCreateRequest(login: String,
+case class UserCreateRequest(user_name: String,
                              password: String,
-                             user_name: String)
+                             name: String)

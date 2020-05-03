@@ -2,7 +2,7 @@ name := """oauth20-provider"""
 
 version := "1.0"
 
-scalaVersion := "2.12.10"
+scalaVersion := "2.12.8"
 
 resolvers += Resolver.bintrayRepo("hseeberger", "maven")
 
@@ -17,8 +17,8 @@ scalacOptions := Seq(
 )
 
 val AkkaHttpV = "10.1.11"
-val AkkaV = "2.6.3"
-val circeVersion = "0.13.0"
+val AkkaV = "2.6.1"
+val circeVersion = "0.12.3"
 val slickPgVersion = "0.19.0"
 
 val postgresDeps = Seq(
@@ -50,7 +50,7 @@ libraryDependencies ++= postgresDeps ++ Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
 
-  "de.heikoseeberger" %% "akka-http-circe" % "1.31.0",
+  "de.heikoseeberger" %% "akka-http-circe" % "1.30.0",
 
 //  "com.github.scopt" %% "scopt" % "4.0.0-RC2",
   
@@ -61,14 +61,16 @@ libraryDependencies ++= postgresDeps ++ Seq(
   "org.spockframework" % "spock-core" % "1.3-groovy-2.5" % "test",
   "org.spockframework" % "spock-guice" % "1.3-groovy-2.5" % "test",
 
-  "org.typelevel" %% "cats-core" % "2.1.1",
+  "org.typelevel" %% "cats-core" % "2.0.0",
 
   "commons-codec" % "commons-codec" % "1.13",
 
-  "io.circe" %% "circe-yaml" % circeVersion,
+  "io.circe" %% "circe-yaml" % "0.12.0",
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
-  "io.circe" %% "circe-parser" % circeVersion
+  "io.circe" %% "circe-parser" % circeVersion,
+
+  "io.lemonlabs" %% "scala-uri" % "2.2.0"
 )
 
 assemblyJarName in assembly := "oauth20-provider.jar"

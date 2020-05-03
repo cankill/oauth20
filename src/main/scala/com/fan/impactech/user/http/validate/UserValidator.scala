@@ -28,9 +28,9 @@ object UserValidator {
       def readyState (): Behavior[Protocol] = Behaviors.receiveMessage {
         case ValidateUserRequest(userCreateRequest, sender) =>
           log.debug(s"""Received message: ValidateUserRequest($userCreateRequest, $sender)""")
-          val vlidatedResult = UserValidatorNec.validateUserCreateRequest(userCreateRequest.login,
+          val vlidatedResult = UserValidatorNec.validateUserCreateRequest(userCreateRequest.user_name,
                                                                           userCreateRequest.password,
-                                                                          userCreateRequest.user_name)
+                                                                          userCreateRequest.name)
           vlidatedResult match {
             case Valid(user) =>
               log.debug(s"""User create request validated successfully""")

@@ -3,7 +3,7 @@ package com.fan.impactech.client.dao
 import akka.Done
 import com.fan.impactech.client.dao.domain.ClientDTO
 import com.fan.impactech.dao.GenericDao
-import com.fan.impactech.db.{ExtendedPostgresDriver, HasDatabaseConfig}
+import com.fan.impactech.db.{ExtendedPostgresDriver, HasDatabaseConfig, TableHolder}
 import com.fan.impactech.client.mapper.ClientMapper
 import com.typesafe.scalalogging.LazyLogging
 import scaldi.{Injectable, Injector}
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ClientDao (implicit val injector: Injector) extends Injectable
   with GenericDao[ClientDTO, Done]
   with HasDatabaseConfig[ExtendedPostgresDriver]
-  with ClientTableHolder
+  with TableHolder
   with LazyLogging {
   import profile.api._
 

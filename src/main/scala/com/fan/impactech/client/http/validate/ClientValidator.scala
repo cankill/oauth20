@@ -26,13 +26,13 @@ object ClientValidator {
         case ValidateClientRequest(clientCreateRequest, sender) =>
           log.debug(s"""Received message: ValidateClientRequest($clientCreateRequest, $sender)""")
           val vlidatedResult = ClientValidatorNec.validateClientCreateRequest(clientCreateRequest.client_id,
-                                                                              clientCreateRequest.application_id,
                                                                               clientCreateRequest.secret_id,
                                                                               clientCreateRequest.callback_url)
           vlidatedResult match {
             case Valid(client) =>
               log.debug(s"""Client create request validated successfully""")
               sender ! ClientValid(client)
+              
             case Invalid(errors) =>
               log.debug(s"""Client create request invalid with messages: $errors""")
               sender ! ClientInvalid(errors.map(_.errorMessage).iterator.toSeq)

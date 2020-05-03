@@ -35,10 +35,10 @@ object UserRepository {
         val log = context.log // thread safe copy
 
         def readyState (): Behavior[Protocol] = Behaviors.receiveMessage {
-          case GetUser(login, sender) =>
-            log.debug(s"""Received message: GetUser($login, $sender)""")
+          case GetUser(userName, sender) =>
+            log.debug(s"""Received message: GetUser($userName, $sender)""")
 
-            context.pipeToSelf(userDao.get(Seq(login))) {
+            context.pipeToSelf(userDao.get(Seq(userName))) {
               case Success(Nil) => WrappedUpdateResult(UserNotFound, sender)
               case Success(users) => WrappedUpdateResult(UserFound(users), sender)
               case Failure(ex) => WrappedUpdateResult(DbFailure(ex), sender)
@@ -49,7 +49,7 @@ object UserRepository {
           case AddUser(newUser, sender) =>
             log.debug(s"""Received message: AddUser($newUser, $sender)""")
 
-            context.pipeToSelf(userDao.exists(newUser.login)) {
+            context.pipeToSelf(userDao.exists(newUser.userName)) {
               case Success(true) => WrappedUpdateResult(UserExists, sender)
               case Success(false) => CreateUser(newUser, sender)
               case Failure(ex) => WrappedUpdateResult(DbFailure(ex), sender)
@@ -57,10 +57,10 @@ object UserRepository {
 
             createState()
 
-          case DeleteUser(login, sender) =>
-            log.debug(s"""Received message: DeleteUser($login, $sender)""")
+          case DeleteUser(userName, sender) =>
+            log.debug(s"""Received message: DeleteUser($userName, $sender)""")
 
-            context.pipeToSelf(userDao.remove(login)) {
+            context.pipeToSelf(userDao.remove(userName)) {
               case Success(true) => WrappedUpdateResult(UserDeleted, sender)
               case Success(false) => WrappedUpdateResult(UserNotFound, sender)
               case Failure(ex) => WrappedUpdateResult(DbFailure(ex), sender)
@@ -89,8 +89,8 @@ object UserRepository {
             replyTo ! result
             stashBuffer.unstashAll(readyState())
             
-          case getUsersg @ GetUser(login, sender) =>
-            log.debug(s"""Will stash received message: GetUser($login, $sender)""")
+          case getUsersg @ GetUser(userName, sender) =>
+            log.debug(s"""Will stash received message: GetUser($userName, $sender)""")
             stashBuffer.stash(getUsersg)
             Behaviors.same
 
@@ -99,8 +99,8 @@ object UserRepository {
             stashBuffer.stash(addUserMsg)
             Behaviors.same
 
-          case deleteUserMsg @ DeleteUser(login, sender) =>
-            log.debug(s"""Will stash received message: DeleteUser($login, $sender)""")
+          case deleteUserMsg @ DeleteUser(userName, sender) =>
+            log.debug(s"""Will stash received message: DeleteUser($userName, $sender)""")
             stashBuffer.stash(deleteUserMsg)
             Behaviors.same
 

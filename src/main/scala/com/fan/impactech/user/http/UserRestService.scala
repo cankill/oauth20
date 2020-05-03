@@ -41,7 +41,7 @@ class UserRestService (implicit inject: Injector) extends Injectable with LazyLo
             case Success(UserValid(userDTO)) =>
               onComplete(userRepo.ask[UserResponseMessage](ref => AddUser(userDTO, ref))) {
                 case Success(UserCreated) =>
-                  complete(StatusCodes.Created -> userDTO.login)
+                  complete(StatusCodes.Created -> userDTO.userName)
 
                 case Success(UserExists) =>
                   complete(StatusCodes.BadRequest -> "User already exists")
@@ -62,9 +62,9 @@ class UserRestService (implicit inject: Injector) extends Injectable with LazyLo
       }
     } ~
     get {
-      path("user" / Segment ) { userId =>
-        logger.debug(s"Got request to get exist User: $userId")
-        onComplete(userRepo.ask[UserResponseMessage](ref => GetUser(userId, ref))) {
+      path("user" / Segment ) { userName =>
+        logger.debug(s"Got request to get exist User: $userName")
+        onComplete(userRepo.ask[UserResponseMessage](ref => GetUser(userName, ref))) {
           case Success(UserFound(users)) =>
             complete(StatusCodes.OK -> users.asJson)
 
@@ -82,9 +82,9 @@ class UserRestService (implicit inject: Injector) extends Injectable with LazyLo
       }
     } ~
     delete {
-      path("user" / Segment ) { userId =>
-        logger.debug(s"Got request to delete exist User: $userId")
-        onComplete(userRepo.ask[UserResponseMessage](ref => DeleteUser(userId, ref))) {
+      path("user" / Segment ) { userName =>
+        logger.debug(s"Got request to delete exist User: $userName")
+        onComplete(userRepo.ask[UserResponseMessage](ref => DeleteUser(userName, ref))) {
           case Success(UserDeleted) =>
             complete(StatusCodes.NoContent)
 

@@ -4,8 +4,8 @@ sealed trait UserDomainValidation {
   def errorMessage: String
 }
 
-case object UserLoginHasSpecialCharacters extends UserDomainValidation {
-  def errorMessage: String = "login cannot contain special characters."
+case object UserNameHasSpecialCharacters extends UserDomainValidation {
+  def errorMessage: String = "user_name cannot contain special characters."
 }
 
 case object PasswordDoesNotMeetCriteria extends UserDomainValidation {

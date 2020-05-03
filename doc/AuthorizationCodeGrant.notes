@@ -1,0 +1,52 @@
+Authorization Code Grant
+
+Auth request in URL:
+response_type=code - REQUIRED.
+client_id - REQUIRED.
+redirect_uri - OPTIONAL. 
+scope - OPTIONAL.
+state - RECOMMENDED.
+
+GET /authorize?response_type=code&client_id=s6BhdRkqt3&state=xyz&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+Host: server.example.com
+
+Auth response in redirect URL:
+code - REQUIRED. The authorization code is bound to the client identifier and redirection URI.
+state - REQUIRED if the "state" parameter was present in the client authorization request.
+
+HTTP/1.1 302 Found
+Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=xyz
+
+Error response in redirect URL:
+error - REQUIRED.  A single ASCII error code from [invalid_request, unauthorized_client, access_denied, unsupported_response_type, invalid_scope, server_error, temporarily_unavailable]
+error_description - OPTIONAL. Human-readable ASCII.
+error_uri - OPTIONAL.  A URI identifying a human-readable web page with information about the error.
+state - REQUIRED if the "state" parameter was present in the client authorization request.
+
+HTTP/1.1 302 Found Location: https://client.example.com/cb?error=access_denied&state=xyz
+
+Access Token Request
+grant_type=authorization_code - REQUIRED.
+code - REQUIRED. The authorization code received from the authorization server.
+redirect_uri - REQUIRED, if the "redirect_uri" parameter was included in the authorization request, and their values MUST be identical.
+client_id - REQUIRED, if the client is not authenticating with the authorization server.
+
+POST /token?grant_type=authorization_code&code=SplxlOBeZQQYbYS6WxSbIA&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
+HTTP/1.1
+Host: server.example.com
+Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+
+Access Token Response
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+ "access_token":"2YotnFZFEjr1zCsicMWpAA",
+ "token_type":"example",
+ "expires_in":3600,
+ "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA",
+ "example_parameter":"example_value"
+}
+     

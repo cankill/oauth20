@@ -17,14 +17,15 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: application_id
-                  type: varchar(50)
-              - column:
                   name: secret_id
-                  type: varchar(50)
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
               - column:
                   name: state
                   type: varchar(50)
+                  constraints:
+                    nullable: false
               - column:
                   name: created
                   type: datetime
@@ -46,6 +47,18 @@ databaseChangeLog:
                   name: callback_url
                   type: varchar(255)
 
+#  - changeSet:
+#      id: create Index for client_id and callback_url
+#      author: fan
+#      changes:
+#        - createIndex:
+#            tableName: client
+#            indexName: idx_client_id_callback_url
+#            columns:
+#              - column:
+#                  name: client_id
+#              - column:
+#                  name: callback_url
   - changeSet:
       id: Create User table
       author: fan
@@ -54,7 +67,7 @@ databaseChangeLog:
             tableName: user
             columns:
               - column:
-                  name: login
+                  name: user_name
                   type: varchar(255)
                   constraints:
                     primaryKey: true
@@ -62,13 +75,68 @@ databaseChangeLog:
               - column:
                   name: password
                   type: varchar(255)
+                  constraints:
+                    nullable: false
               - column:
-                  name: user_name
+                  name: name
                   type: varchar(255)
               - column:
                   name: created
                   type: datetime
                   defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modified
+                  type: datetime
+
+  - changeSet:
+      id: Create Authorization code table
+      author: fan
+      changes:
+        - createTable:
+            tableName: authorization_code
+            columns:
+              - column:
+                  name: client_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_client_id
+                    references: client(client_id)
+                    primaryKey: true
+                    primaryKeyName: pk_auth_code
+              - column:
+                  name: callback_url
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_auth_code
+              - column:
+                  name: code
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_name
+                    references: user(user_name)
+                    primaryKey: true
+                    primaryKeyName: pk_auth_code
+              - column:
+                  name: created
+                  type: datetime
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expire_at
+                  type: datetime
+                  defaultValueComputed: now() + interval '10 minutes'
                   constraints:
                     nullable: false
               - column:

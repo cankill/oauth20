@@ -3,7 +3,6 @@ package com.fan.impactech.client.dao.domain
 import java.time.Instant
 
 case class ClientDTO (clientId: String,
-                      applicationId: String,
                       secretId: String,
                       callbackUrl: String,
                       state: ClientState,
