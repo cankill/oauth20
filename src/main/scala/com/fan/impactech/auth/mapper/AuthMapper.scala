@@ -8,15 +8,14 @@ object AuthMapper {
                                                                  authDTO.callbackUrl,
                                                                  authDTO.code,
                                                                  authDTO.userName,
+                                                                 false,
                                                                  authDTO.created,
-                                                                 authDTO.expireAt,
-                                                                 authDTO.modified)
+                                                                 authDTO.expireAt)
 
   def apply(authDTO: AuthCodeEntry): AuthCodeDTO = AuthCodeDTO(authDTO.clientId,
                                                                authDTO.callbackUrl,
                                                                authDTO.code,
                                                                authDTO.userName,
                                                                authDTO.created,
-                                                               authDTO.expireAt,
-                                                               authDTO.modified)
+                                                               authDTO.expireAt)
 }

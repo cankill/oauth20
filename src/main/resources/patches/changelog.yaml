@@ -104,15 +104,11 @@ databaseChangeLog:
                     nullable: false
                     foreignKeyName: fk_client_id
                     references: client(client_id)
-                    primaryKey: true
-                    primaryKeyName: pk_auth_code
               - column:
                   name: callback_url
                   type: varchar(255)
                   constraints:
                     nullable: false
-                    primaryKey: true
-                    primaryKeyName: pk_auth_code
               - column:
                   name: code
                   type: varchar(255)
@@ -125,8 +121,10 @@ databaseChangeLog:
                     nullable: false
                     foreignKeyName: fk_user_name
                     references: user(user_name)
-                    primaryKey: true
-                    primaryKeyName: pk_auth_code
+              - column:
+                  name: used
+                  type: boolean
+                  defaultValue: false
               - column:
                   name: created
                   type: datetime
@@ -139,6 +137,109 @@ databaseChangeLog:
                   defaultValueComputed: now() + interval '10 minutes'
                   constraints:
                     nullable: false
+
+  - changeSet:
+      id: create Index for authorization_code
+      author: fan
+      changes:
+        - createIndex:
+            tableName: authorization_code
+            indexName: idx_client_id_callback_url_user_name
+            columns:
               - column:
-                  name: modified
+                  name: client_id
+              - column:
+                  name: callback_url
+              - column:
+                  name: user_name
+        - createIndex:
+            tableName: authorization_code
+            indexName: idx_code
+            columns:
+              - column:
+                  name: code
+
+  - changeSet:
+      id: Create Token table
+      author: fan
+      changes:
+        - createTable:
+            tableName: token
+            columns:
+              - column:
+                  name: client_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_client_id
+                    references: client(client_id)
+              - column:
+                  name: user_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_name
+                    references: user(user_name)
+              - column:
+                  name: callback_url
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: access_token
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: refresh_token
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: revoked
+                  type: boolean
+                  defaultValue: false
+              - column:
+                  name: created
                   type: datetime
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expire_at
+                  type: datetime
+                  defaultValueComputed: now() + interval '3600 seconds'
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: create Index for token
+      author: fan
+      changes:
+        - createIndex:
+            tableName: token
+            indexName: idx_client_id_user_name_callback_url
+            columns:
+              - column:
+                  name: client_id
+              - column:
+                  name: user_name
+              - column:
+                  name: callback_url
+        - createIndex:
+            tableName: token
+            indexName: idx_refresh_token
+            columns:
+              - column:
+                  name: refresh_token
+
+  - changeSet:
+      id: create Index for token access_token
+      author: fan
+      changes:
+        - createIndex:
+            tableName: token
+            indexName: idx_access_token
+            columns:
+              - column:
+                  name: access_token

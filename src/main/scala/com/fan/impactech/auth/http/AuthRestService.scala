@@ -11,13 +11,9 @@ import com.fan.impactech.auth.service.AuthService
 import com.fan.impactech.auth.service.AuthService.{AuthResponseMessage, Authenticate, Authenticated, Authorize, DbFailure, Rejected}
 import com.fan.impactech.client.http.validate.ClientValidator
 import com.fan.impactech.client.repo.ClientRepository
-import com.fan.impactech.client.repo.ClientRepository.{ClientDeleted, ClientFound, ClientNotFound, ClientResponseMessage, GetClient}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import io.circe.Decoder
-import io.circe.syntax._
-import io.circe.generic.auto._
 import scaldi.{Injectable, Injector}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,8 +25,6 @@ class AuthRestService (implicit inject: Injector) extends Injectable with FailFa
   private implicit val actorSystem: ActorSystem[Nothing] = inject[ActorSystem[Nothing]]
 
   val authService: TypedActorRef[AuthService.Protocol] = inject[TypedActorRef[AuthService.Protocol]]
-  val clientRepo: TypedActorRef[ClientRepository.Protocol] = inject[TypedActorRef[ClientRepository.Protocol]]
-  val clientValidator: TypedActorRef[ClientValidator.Protocol] = inject[TypedActorRef[ClientValidator.Protocol]]
 
   private val config: Config = inject[Config]
   private implicit val timeout: Timeout = 2.minutes

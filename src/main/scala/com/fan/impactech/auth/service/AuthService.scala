@@ -80,10 +80,10 @@ object AuthService {
                 val callBackUrlReply = makeReplyUrl(callbackUrl,
                                                     authRequest.state,
                                                     "error" -> "unsupported_response_type",
-                                                    "error_description" -> s"${authRequest.responseType} is unsupported")
+                                                    "error_description" -> s"response_type: '${authRequest.responseType}' is unsupported")
                 WrappedAuthResult(Unauthorized(callBackUrlReply), sender)
               } else {
-                CheckCodeExists(userName, authRequest, sender)
+                CheckCodeExists(userName, authRequest.copy(redirectUrl = Some(callbackUrl)), sender)
               }
 
             case Success(None) => WrappedAuthResult(Rejected("access_denied", s"Client ${authRequest.clientId} not found"), sender)
@@ -176,7 +176,7 @@ object AuthService {
   private def makeReplyUrl[KV: QueryKeyValue](callBackUrl: String, state: Option[String], params: KV*): String = {
     val parsedCallbackUrl = Url.parse(callBackUrl)
     val callbackUrlWithState = if (state.isDefined) parsedCallbackUrl.addParam("state" -> state.get) else parsedCallbackUrl
-    callbackUrlWithState.addParams(params).toStringRaw
+    callbackUrlWithState.addParams(params).toString
   }
 
   final case class LockKey(userName: String, clientId: String, callbackUrl: String)

@@ -7,5 +7,4 @@ case class AuthCodeDTO (clientId: String,
                         code: String,
                         userName: String,
                         created: Instant,
-                        expireAt: Instant,
-                        modified: Option[Instant])
+                        expireAt: Instant)

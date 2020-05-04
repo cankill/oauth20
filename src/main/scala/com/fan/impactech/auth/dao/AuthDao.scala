@@ -8,7 +8,6 @@ import scala.concurrent.duration.FiniteDuration
 
 trait AuthDao {
   def getUserCredentials (userName: String): Future[Option[StoredCredentials]]
-  def getClientCredentials (clientId: String): Future[Option[StoredCredentials]]
   def getClientCallbackUrl (clientId: String): Future[Option[String]]
   def getAuthorizationCode (clientId: String, userName: String, callbackUrl: String): Future[Option[AuthCodeDTO]]
   def makeAuthorizationCode (clientId: String, userName: String, callbackUrl: String, code: String, expiration: FiniteDuration): Future[Boolean]

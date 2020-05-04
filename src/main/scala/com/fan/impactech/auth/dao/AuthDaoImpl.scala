@@ -23,16 +23,8 @@ class AuthDaoImpl (implicit val injector: Injector) extends Injectable
   private implicit val ec: ExecutionContext = inject[ExecutionContext]('executionContext)
   override protected val dbConfig: DatabaseConfig[ExtendedPostgresDriver] = DatabaseConfig.forConfig[ExtendedPostgresDriver]("database")
 
-  def toCredentials(clientEntry: ClientEntry): StoredCredentials = {
-    StoredCredentials(clientEntry.clientId, clientEntry.secretId)
-  }
-
   def toCredentials(userEntry: UserEntry): StoredCredentials = {
     StoredCredentials(userEntry.userName, userEntry.password)
-  }
-  
-  override def getClientCredentials(clientId: String): Future[Option[StoredCredentials]] = {
-    db.run(clients.filter(_.clientId === clientId).result.headOption).map(_.map(toCredentials))
   }
 
   override def getUserCredentials(userName: String): Future[Option[StoredCredentials]] = {
@@ -47,13 +39,14 @@ class AuthDaoImpl (implicit val injector: Injector) extends Injectable
     db.run(authCode.filter(row => row.clientId === clientId
                                   && row.userName === userName
                                   && row.callbackUrl === callbackUrl
-                                  && row.expireAt > Instant.now).result.headOption).map(_.map(AuthMapper(_)))
+                                  && row.expireAt > Instant.now
+                                  && !row.used).result.headOption).map(_.map(AuthMapper(_)))
   }
 
-  def makeAuthorizationCode (clientId: String, userName: String, callbackUrl: String, code: String, expiration: FiniteDuration): Future[Boolean] = {
+  override def makeAuthorizationCode (clientId: String, userName: String, callbackUrl: String, code: String, expiration: FiniteDuration): Future[Boolean] = {
     val now = Instant.now
     val expiredAt = now.plusSeconds(expiration.toSeconds)
-    val insertCode = authCode += AuthCodeEntry(clientId, callbackUrl, code, userName, now, expiredAt, None)
+    val insertCode = authCode += AuthCodeEntry(clientId, callbackUrl, code, userName, false, now, expiredAt)
     db.run(insertCode).map(_ > 0)
   }
 }
